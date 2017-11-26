@@ -1,0 +1,13 @@
+2017-11-26 07:36:33,146 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 07:43:52,133 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 07:49:35,876 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 07:52:28,965 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 07:53:27,477 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 07:53:53,495 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 07:59:03,207 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 07:59:35,247 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 08:05:40,654 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 08:07:16,596 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 08:10:38,515 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 08:18:57,418 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2017-11-26 08:19:18,145 [main] [org.apache.ibatis.logging.LogFactory] [DEBUG] - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
