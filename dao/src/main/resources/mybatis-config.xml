@@ -6,22 +6,20 @@
 
 <configuration>
     <!--
-        (了解)配置 mybatis 的环境.
+        配置 mybatis 的环境.
         1. environments 节点下可以有多个 environment 子节点.
         2. default 指向某一个 environment 的 id, 以确定需要使用哪一个作为运行时环境.
     -->
     <environments default="development">
         <!--
-            (了解)配置具体的环境.
+            配置具体的环境.
             1. id 唯一标识当前的 environment 节点. 以被 environments 来引用.
         -->
         <environment id="development">
-            <!--
-                (了解)指定事务的处理类型. 取默认值即可.
-            -->
+            <!--指定事务的处理类型. 取默认值即可.-->
             <transactionManager type="JDBC" />
             <!--
-                (了解)配置数据源. type 指定使用数据源的类型.
+                配置数据源. type 指定使用数据源的类型.
                 prooperty 子节点指定连接数源的基本信息.
             -->
             <dataSource type="POOLED">
@@ -33,9 +31,11 @@
         </environment>
     </environments>
 
-    <!-- (了解)关联多个映射文件 -->
+    <!-- 关联多个映射文件 -->
     <mappers>
-        <!-- (了解)关联具体的映射文件 -->
+        <!-- 关联具体的映射文件 -->
         <mapper resource="com/adolph/mapper/MessageMapper.xml" />
     </mappers>
+
+
 </configuration>

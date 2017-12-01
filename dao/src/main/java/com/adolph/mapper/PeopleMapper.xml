@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	namespace: 名称空间. 是对当前 Mapper 文件的唯一标示.
+	通常以 (实体类类名 + Mapper) 结尾
+-->
+<mapper namespace="com.adolph.mapper.PeopleMapper">
+
+    <insert id="saveId">
+        INSERT INTO people(id, last_name)
+        VALUES(#{id}, #{lastName})
+    </insert>
+
+    <insert id="saveMap">
+        INSERT INTO people(last_name, first_name)
+        VALUES(#{lastName}, #{firstName})
+    </insert>
+
+    <insert id="saveParams">
+        INSERT INTO people(last_name, age)
+        VALUES(#{lastName}, #{age})
+    </insert>
+
+    <insert id="savePeople">
+        INSERT INTO people (last_name, age, first_name)
+        VALUES(#{lastName}, #{age}, #{firstName})
+    </insert>
+    <!--
+        映射一个查询语句
+        1. id 唯一标识改查询语句. 可以通过当前映射文件的 namespace 和 id 来唯一的定位到当前的 select.
+        2. resultType 指定返回值的类型. 通常为全类名.
+        3. 注意: 若类的属性名和数据表的列名不一致, 则可以使用别名
+    -->
+    <select id="selectPeople" resultType="com.adolph.beans.People">
+        select id, last_name AS "lastName" from people where id = #{id}
+    </select>
+
+</mapper>

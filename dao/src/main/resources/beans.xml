@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <bean id="dataSource"
+          class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="user" value="${jdbc.user}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <property name="driverClass" value="${jdbc.driverClass}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+    </bean>
+
+    <!-- 1. 配置事务管理器. mybatis 使用的事务管理器和 jdbc 使用的事务管理器是同一个事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- 2. 启用 Spring 的事务注解 -->
+    <tx:annotation-driven />
+
+    <!-- 3. 配置 SqlSessionFactoryBean -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 定位 mybatis 原生的配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+
+        <!--
+        	配置 databaseIdProvider
+        	该属性的类型为： DatabaseIdProvider 类型.
+        	而 VendorDatabaseIdProvider 正是 DatabaseIdProvider 接口的一个实现类.
+        	而 VendorDatabaseIdProvider 只有一个属性: properties. 是 Properties 类型. 用于配置数据库的映射关系
+        	key: 数据库的名字. 是 DatabaseMetaData#getDatabaseProductName() 方法的返回值.
+        	MySQL 的返回值为 MySQL. Oracle 的返回值为 Oracle.
+        	val: 映射的值. 供在 Mapper.xml 文件中的 databaseId 属性使用
+        -->
+        <property name="databaseIdProvider">
+            <bean class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+                <property name="properties">
+                    <props>
+                        <prop key="MySQL">mysql</prop>
+                        <prop key="Oracle">oracle</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- 4. 扫描 Mapper, 并使其可以被自动装配.  -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.adolph" />
+    </bean>
+
+</beans>

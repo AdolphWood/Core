@@ -7,12 +7,16 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="dao" />
+        <module name="tools" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Core" target="1.5" />
       <module name="dao" target="1.5" />
+      <module name="kotlin_main" target="1.8" />
+      <module name="kotlin_test" target="1.8" />
       <module name="mybatis" target="1.5" />
+      <module name="tools" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
