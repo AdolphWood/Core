@@ -21,10 +21,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MybatisTest {
     private ApplicationContext ctx = null;
@@ -213,5 +210,19 @@ public class MybatisTest {
 
         System.out.println(order1 == order2);
     }
+    @Test
+    public void testIf(){
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("minId", 2);
+        params.put("maxId", 12);
+        List<Order> orders = orderMapper.testIf(params);
+        System.out.println(orders.size());
+    }
+    @Test
+    public void testForEach(){
+        List<Integer> ids = Arrays.asList(1,2,4,5, 6, 7);
+        List<Order> orders = orderMapper.testForEach(ids);
 
+        System.out.println(orders.size());
+    }
 }

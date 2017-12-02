@@ -3,7 +3,61 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.adolph.mapper.OrderMapper">
+    <!--
+        mybatis VS hibernate
+        1. 都是 ORM 框架. 可以映射关联关系. 对多的关系 还是 对一关联关系
+        2. hibernate 是全自动的 ORM 框架.
+                优点: 开发简单, 上手速度快.
+                缺点: 不灵活. 运行速度相对慢.
+           mybatis 是半自动的 ORM 框架.
+                优点: 灵活. 运行速度快.
+                缺点: 需要编写 SQL. 所以开发速度慢.
 
+        mybatis VS dbutils 或 SpringJdbcTemplate
+        1. 为什么 dbutils 或 SpringJdbcTempate 不能称为是框架 ?
+        因为他们不能去映射关联关系.
+        2. 开发速度相当.
+
+        ssm: Spring、SpringMVC、mybatis.
+        把 hibernate 的部分该 mybatis.
+    -->
+    <!--
+        动态 SQL.
+        1. 若查询条件中有 > 或 <, 则此部分代码需要放在 CDATA 中.
+        2. 使用 where 和 if 节点来构建动态 SQL.
+        1). 若 where 中的 if 一个都不满足, 则就不会添加 where 子句.
+        2). 若 where 中有一个 if 满足条件, 则就会自动的生成 where 子句.
+        且会根据实际情况, 删除 if 中的 AND 或 OR
+        3. 使用 foreach 可以完成 IN 操作符的效果.
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+        若传入的 ids 为 {1,2,3,4} 生成后的效果如下
+        (1,2,3,4)
+    -->
+    <select id="testForEach" resultType="com.adolph.beans.Order">
+        SELECT id, order_number
+        FROM orders
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="testIf" resultType="com.adolph.beans.Order">
+        SELECT id, order_number
+        FROM orders
+        <where>
+            <if test="minId != null">
+                id >= #{minId}
+            </if>
+            <if test="maxId != null">
+                <![CDATA[
+				AND id <= #{maxId}
+			]]>
+            </if>
+        </where>
+    </select>
     <!--
         若使用二级缓存, 则配置 cache 节点、且 bean 必须实现 Serializable 接口
         若使用 mybatis 默认的缓存方式, 则 bean 在缓存中保持的方式为 "散装数据".
@@ -189,5 +243,4 @@
         SELECT id, order_number
         FROM orders
     </select>
-
 </mapper>
