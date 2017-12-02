@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Select;
 import java.util.Map;
 
 public interface PeopleMapper {
+    void testDatabaseId(People people);
+
     void saveId(People people, @Param("id") Integer id);
 
     void saveMap(Map<String, Object> params);

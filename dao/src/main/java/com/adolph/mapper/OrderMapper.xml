@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adolph.mapper.OrderMapper">
+
+    <!--
+        若使用二级缓存, 则配置 cache 节点、且 bean 必须实现 Serializable 接口
+        若使用 mybatis 默认的缓存方式, 则 bean 在缓存中保持的方式为 "散装数据".
+
+        使用 ehcache 作为缓存方式.
+        1. 加入
+        ehcache-core-2.6.8.jar
+        mybatis-ehcache-1.0.3.jar
+        slf4j-api-1.6.1.jar
+        2. 配置 type 属性为: org.mybatis.caches.ehcache.EhcacheCache
+        3. 可以配置属性, 具体的属性值可以参照 org.mybatis.caches.ehcache.EhcacheCache 中的 setter 方法.
+    -->
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache">
+        <property name="timeToLiveSeconds" value="3"/>
+    </cache>
+    <!--
+        1. 若在一个 junit 测试方法中, 调用两次 Mapper 的方法, 则无法使用一级缓存.
+        因为每一次调用 Mapper 方法, 实际上都获取了一个新的链接.
+        2. 应该怎么测试呢 ?
+        1). 在一个事务方法中多次调用一个 Mapper 的多个方法.
+        2). 使用一个 SqlSession 对象.
+    -->
+    <select id="testCache" resultType="com.adolph.beans.Order">
+        SELECT id, order_number
+        FROM orders o
+        WHERE o.id = #{id}
+    </select>
+    <!--
+        映射集合属性, 也可以分两条语句.
+        使用 collection 映射集合属性!
+        1. 使用 select 标记使用的另一条 SQL 的 id
+        2. 若使用了 select 属性, 则不能再使用 javaType 来标记集合中元素的类型, 而要使用 ofType.
+        3. 使用 column 传递 select 对应 SQL 中的参数. 通常为当前 SQL 的主键列的列名.
+        4. 若需要对关联的集合对象使用懒加载, 则需要设置 collection 的 fetchType 属性为 lazy. 默认为 eager.
+    -->
+    <select id="selectCustomer3" resultMap="customerMap3">
+        SELECT c.id, last_name
+        FROM customers c
+        WHERE c.id = #{id}
+    </select>
+    <resultMap type="com.adolph.beans.Customer" id="customerMap3">
+        <id column="id" property="id"/>
+        <result column="last_name" property="lastName"/>
+        <collection property="orders" ofType="com.adolph.beans.Order"
+                    select="selectOrder" column="id" fetchType="lazy"></collection>
+    </resultMap>
+    <select id="selectOrder" resultType="com.adolph.beans.Order">
+        SELECT id, order_number
+        FROM orders
+        WHERE customer_id = #{id}
+    </select>
+    <!--
+        1. 映射集合属性, 不能使用别名, 必须使用 resultMap!
+        2. 在 resultMap 中使用 collection 来映射集合属性.
+    -->
+    <select id="selectCustomer2" resultMap="customerMap2">
+        SELECT c.id, last_name, o.id AS "o_id", order_number
+        FROM customers c
+        LEFT OUTER JOIN orders o
+        ON c.id = o.customer_id
+        WHERE c.id = #{id}
+    </select>
+    <resultMap type="com.adolph.beans.Customer" id="customerMap2">
+        <id column="id" property="id"/>
+        <result column="last_name" property="lastName"/>
+        <!-- 映射集合属性 -->
+        <collection property="orders" javaType="com.adolph.beans.Order">
+            <id column="o_id" property="id"/>
+            <result column="order_number" property="orderNumber"/>
+        </collection>
+    </resultMap>
+    <!--
+        1. 映射集合属性, 不能使用别名, 必须使用 resultMap!
+    -->
+    <!--
+    <select id="selectCustomer2" resultType="com.adolph.beans.Customer">
+        SELECT c.id, last_name, o.id AS "orders.id", order_number AS "orders.orderNumber"
+        FROM customers c
+        LEFT OUTER JOIN orders o
+        ON c.id = o.customer_id
+        WHERE c.id = #{id}
+    </select>
+    -->
+    <!--
+        注意: 只要有列名相同的, 一定要为列名起别名!
+        使用外连接查询时, 除了使用别名映射关联 bean 外, 也可以使用 association 完成手动的映射
+    -->
+    <select id="testAssociation3" resultMap="orderMap3">
+        SELECT o.id, order_number, c.id AS "c_id", last_name
+        FROM orders o
+        LEFT OUTER JOIN customers c
+        ON o.customer_id = c.id
+        WHERE o.id = #{id}
+    </select>
+    <resultMap type="com.adolph.beans.Order" id="orderMap3">
+        <id column="id" property="id"/>
+        <result column="order_number" property="orderNumber"/>
+
+        <association property="customer" javaType="com.adolph.beans.Customer">
+            <id column="c_id" property="id"/>
+            <result column="last_name" property="lastName"/>
+        </association>
+    </resultMap>
+    <!--
+        使用 association 来映射关联的属性
+    -->
+    <select id="testAssociation2" resultMap="orderMap2">
+        SELECT id, order_number, customer_id
+        FROM orders
+        WHERE id = #{id}
+    </select>
+    <resultMap type="com.adolph.beans.Order" id="orderMap2">
+        <id column="id" property="id"/>
+        <result column="order_number" property="orderNumber"/>
+        <!--
+            property: 关联属性的属性名
+            select: 使用的 select 查询的 id
+            javaType: 返回的类型
+            column: 若额外的 select 需要传递参数, 则使用 column 标记把当前查询到的那一列的列值传递过去.
+        -->
+        <association property="customer"
+                     select="selectCustomer"
+                     column="customer_id"
+                     javaType="com.adolph.beans.Customer"></association>
+    </resultMap>
+    <!--
+        如何实现懒加载的效果.
+        需要在 mybatis-config.xml 文件中设置两个属性
+        lazyLoadingEnabled: true. 启用懒加载.
+        aggressiveLazyLoading: false. 默认值为 true： 若加载当前 bean的一个属性, 则会侵略性的加载其所有关联的属性.
+        即若只需要其 id 属性, 则默认情况下, 也会初始化其关联的 customer 属性.
+    -->
+    <select id="selectCustomer" resultType="com.adolph.beans.Customer">
+        SELECT id, last_name
+        FROM customers
+        WHERE id = #{id}
+    </select>
+    <!--
+        如何分两条 SQL 语句来初始化关联的对象呢 ? 即也有 hibernate 的懒加载的效果.
+        需要学习:
+        1. resultMap: 结果映射. 把查询的结果映射为对应的 bean 的属性.
+        2. 一般滴, 若只查询单表, 则不需要使用 resultMap.
+        3. resultMap 和 resultType 只能选用其一.
+    -->
+    <select id="testResultMap" resultMap="orderMap">
+        SELECT id, order_number
+        FROM orders
+        WHERE id = #{id}
+    </select>
+    <resultMap type="com.adolph.beans.Order" id="orderMap">
+        <!-- 映射  id -->
+        <id column="id" property="id"/>
+        <!-- 映射 id 以外的属性 -->
+        <result column="order_number" property="orderNumber"/>
+    </resultMap>
+    <!--
+        如何在查询出 bean 对象时, 也能查询出其关联的 1 的一端的对象.
+        1. 可以通过 "别名" 的方式为关联的 bean 的属性赋值.
+        customer_id AS "customer.id" 意为: 把查询的 customer_id 赋给当前 bean 的 customer 的 id 属性.
+        2. 可以使用外连接查询得到关联对象的属性.
+        3. jdbcTemplate 和 dbutils 不支持!
+    -->
+    <select id="testAssociation" resultType="com.adolph.beans.Order">
+        SELECT o.id, order_number, c.id AS "customer.id", last_name AS "customer.lastName"
+        FROM orders o
+        LEFT OUTER JOIN customers c
+        ON o.customer_id = c.id
+        WHERE o.id = #{id}
+    </select>
+    <!--
+        1.在编写 mybatis 的变量时, 可以使用属性的级联
+        #{customer.id}: 传入的参数有一个 customer 属性, customer 属性对应的类型还有一个 id 属性.
+
+        2.在 mybatis 中没有持久化状态的这一个概念. 所以
+        1). 默认情况下, 在 insert 后, 不会为 bean 的 id 赋值
+        2). 不能通过修改 bean 对象的属性来修改数据表的内容.
+    -->
+    <insert id="save" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO orders(order_number, customer_id)
+        VALUES(#{orderNumber}, #{customer.id})
+    </insert>
+    <select id="getAll" resultType="com.adolph.beans.Order">
+        SELECT id, order_number
+        FROM orders
+    </select>
+
+</mapper>

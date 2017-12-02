@@ -10,6 +10,54 @@
 -->
 <mapper namespace="com.adolph.mapper.PeopleMapper">
 
+    <!--
+        对于 Oracle 和 MySQL 而言. 插入一条记录的 SQL 是不一样的!
+        MySQL:
+        INSERT INTO people(last_name, first_name)
+        VALUES(#{lastName}, #{firstName})
+
+        Oracle:
+        INSERT INTO people(id, last_name, first_name)
+        VALUES(crm_seq.nextval, #{lastName}, #{firstName})
+    -->
+    <!--
+        <insert id="testDatabaseId" databaseId="mysql">
+            INSERT INTO people(last_name, first_name)
+            VALUES(#{lastName}, #{firstName})
+        </insert>
+
+        <insert id="testDatabaseId" databaseId="oracle">
+            INSERT INTO people(id, last_name, first_name)
+            VALUES(my_seq.nextval, #{lastName}, #{firstName})
+        </insert>
+    -->
+
+    <!--
+        keyProperty: 把主键值赋给 bean 的哪一个属性
+        keyColumn: 使用哪一列的值来进行赋值
+        useGeneratedKeys="true": 使用自增的方式来生成主键值
+    -->
+    <insert id="testDatabaseId" databaseId="mysql" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+        INSERT INTO people(last_name, first_name)
+        VALUES(#{lastName}, #{firstName})
+    </insert>
+
+    <insert id="testDatabaseId" databaseId="oracle">
+        <!--
+            对于 Oracle 而言, 需要使用 selectKey 来生成主键值
+            order="BEFORE": 先于 INSERT 执行
+            selectKey 的标签体: 指定生成主键的查询语句. SELECT 序列名.nextval FROM dual
+            keyProperty: 把标签体的查询结果赋给 bean 的哪一个属性.
+            resultType: 执行标签体查询的结果类型.
+            注意: 下面编写 SQL 时, 主键不能再次使用序列生成. 而要使用 #{keyProperty}
+        -->
+        <selectKey order="BEFORE" keyProperty="id" resultType="int">
+            SELECT my_seq.nextval FROM dual
+        </selectKey>
+        INSERT INTO people(id, last_name, first_name)
+        VALUES(#{id}, #{lastName}, #{firstName})
+    </insert>
+
     <insert id="saveId">
         INSERT INTO people(id, last_name)
         VALUES(#{id}, #{lastName})

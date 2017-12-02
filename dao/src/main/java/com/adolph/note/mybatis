@@ -1,0 +1,43 @@
+2. HelloWorld:
+1). 加入 jar 包:
+asm-3.3.1.jar
+cglib-2.2.2.jar
+commons-logging-1.1.1.jar
+javassist-3.17.1-GA.jar
+log4j-1.2.17.jar
+mybatis-3.2.8.jar
+mybatis-spring-1.2.2.jar
+
+mysql-connector-java-5.1.7-bin.jar
+
+2). 创建持久化类和数据表.
+
+3). 加入 mybatis 的配置文件:
+①. 类似于 hibernate 的配置文件. 用于配置连接数据库的基本信息. 以及设置 mybatis 的基本属性.
+②. Copy From mybatis-3.2.8.pdf 的第 7 页中复制.
+③. 加入 dtd 约束.
+> dtd 文档在 /org/apache/ibatis/builder/xml/mybatis-3-config.dtd 中.
+
+4). 修改 mybatis-config.xml 文件
+①. 修改 property 节点, 以链接自己的数据库
+②. 修改关联的映射文件
+
+5). 加入映射文件:
+①. Copy From mybatis-3.2.8.pdf 的第 8 页
+②. 加入 dtd
+
+6). 修改映射文件
+7). 调用 mybatis 的 API 来完成查询.
+①. Copy From mybatis-3.2.8.pdf 的第 6 页和第 8 页
+
+
+
+1. 什么是 mybatis
+1). ORM 框架.
+2). mybatis 和 dbutils 或 Spring 的  JdbcTempate 有什么区别 ?
+3). mybatis 和 Hibernate 的区别 ?
+
+4). 关于 mybatis:
+Jdbc: 需要编写 SQL, 需要通过原生的 JDBC API 来操作数据表. 所以说是一个全手动的方式来操作数据表.
+Hibernate: 不需要编写 SQL, 也不需要操作任何 JDBC 的 API. 可以通过操作持久化对象的属性来修改数据表中的记录. 所以说是一个全自动的 ORM 框架.
+MyBatis: 介于 Jdbc 和 Hibernate 之间的半自动的操作数据表的 ORM 框架. 需要自己来编写 SQL. 但可以完成对象之间的映射关系.

@@ -5,6 +5,38 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+
+    <!--以下两个配置必须放在前面，否则会报错-->
+    <!-- mybatis 的全局设置. 其中可以加入多个 setting 子节点 -->
+    <settings>
+        <!--
+            映射标准的列名和标准的 bean 的属性名的对应关系
+            标准的列名: 多个单词使用 _ 进行连接
+            标准的属性名: 多个单词, 从第二个单词开始, 每个单词的首字母大写.
+            例如 last_name 和 lastName
+        -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+    </settings>
+
+    <!--
+        配置类型的别名
+        但推荐不使用别名. 因为使用全类名可以快速定位。
+    -->
+    <typeAliases>
+        <!-- 具体配置全类名和别名的映射关系 -->
+        <!--
+        <typeAlias type="ccom.adolph.beans.People" alias="people"/>
+        -->
+        <!--
+        该包以及该包的子包下所有的类的别名均使用不带包名的类名的第一个字母小写作为别名
+        例如: com.adolph.beans.People 的别名为: people
+        -->
+        <package name="com.adolph.beans"/>
+    </typeAliases>
+
     <!--
         配置 mybatis 的环境.
         1. environments 节点下可以有多个 environment 子节点.

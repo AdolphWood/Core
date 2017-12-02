@@ -1,0 +1,181 @@
+1. Spring 集成 mybatis
+    1). 加入 Spring
+
+    2). 加入 mybatis
+        ①. 加入 jar 包:
+            asm-3.3.1.jar
+            cglib-2.2.2.jar
+            commons-logging-1.1.1.jar
+            javassist-3.17.1-GA.jar
+            log4j-1.2.17.jar
+            mybatis-3.2.8.jar
+            mybatis-spring-1.2.2.jar
+        ②. 加入 mybatis 的配置文件
+    3). mybatis 和 Spring 进行整合.
+        ①. 在 Spring 配置数据源
+            > 加入 c3p0 的 jar 包
+            > 配置数据源
+
+    ----------------------------------------------------
+    具体整合方式参照 mybatis 官方提供的 jpetstore-6-master.zip. 具体参照 jpetstore-6-master\src\main\webapp\WEB-INF\applicationContext.xml 文件
+
+    4). 配置 Spring 的配置文件
+    5). 新建 Mapper 接口. 通常以 [类名 + Mapper] 的方式来命名
+        ①. 在其中新建一个方法
+        ②. 使用 @Select 注解来标记查询语句.
+    6). 测试:
+        ①. 从 IOC 容器中取出 Mapper 接口的对象
+        ②. 注意: mybatis 自动为 Mapper 接口生成代理对象.
+
+2. 同时使用 Mapper.xml 文件和 Mapper 接口
+    1). 如何使 Mapper.xml 文件和 Mapper 接口进行匹配 ?
+        接口的全类名要和 Mapper.xml 文件中的 namespace 对应 ! 且 Mapper.xml 文件和 Maper 接口需要在同一个包下.
+
+    2). 如何使 Mapper.xml 文件中的节点(select, update, delete, insert) 和 Mapper 接口中的方法对应呢 ?
+        节点的 id 和方法名同名!
+
+
+3. 关于为 Mapper 的方法传递参数
+    1). 若传递一个参数, 则可以什么多不做. 在 Mapper.xml 文件中的参数名可以随便写.
+    建议使用 @Param 注解进行对应
+
+    Student selectStudent(@Param("id") Integer id);
+    <select id="selectStudent" resultType="com.atguigu.mybatis.beans.Student">
+        select id, last_name AS "lastName", birth from students where id = #{id}
+    </select>
+
+    2). 若传递多个参数, 则有 3 种方式.
+        ①. 传递一个对象. 然后使对象的 getter 方法对应的属性和 SQL 语句中的变量名相对应
+
+            void save(Student student);
+
+            <insert id="save">
+                INSERT INTO students(last_name, birth)
+                VALUES(#{lastName}, #{birth})
+            </insert>
+
+        ②. 传递一个 Map 类型的参数, 在具体使用参数时会调用 Map 的 get(参数名) 方法
+
+            void save3(Map<String, Object> params);
+
+            <insert id="save3">
+                INSERT INTO students(last_name, birth)
+                VALUES(#{lastName}, #{birth})
+            </insert>
+
+        ③. 使用多个 @Param 注解. 使变量名和 SQL 语句中变量名对应
+
+            void save2(@Param("lastName") String lastName,@Param("birth") Date birth);
+
+            <insert id="save2">
+                INSERT INTO students(last_name, birth)
+                VALUES(#{lastName}, #{birth})
+            </insert>
+
+    3). 注意: 以上 3 种传递参数的方式不能混用.
+
+
+4. mybatis 的全局设置:
+    1). 在 mybatis 的配置文件中使用 settings 来进行设置.
+
+    <!-- mybatis 的全局设置. 其中可以加入多个 setting 子节点 -->
+    <settings>
+        <!--
+            映射标准的列名和标准的 bean 的属性名的对应关系
+            标准的列名: 多个单词使用 _ 进行连接
+            标准的属性名: 多个单词, 从第二个单词开始, 每个单词的首字母大写.
+            例如 last_name 和 lastName
+        -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    更多配置可以参见 mybatis-3.2.8.pdf 的 13 页.
+
+5. 使用类型的别名:
+    <!--
+        配置类型的别名
+        但推荐不使用别名. 因为使用全类名可以快速定位。
+    -->
+    <typeAliases>
+        <!-- 具体配置全类名和别名的映射关系 -->
+        <!--
+        <typeAlias type="com.atguigu.mybatis.beans.Student" alias="student"/>
+        -->
+        <!--
+        该包以及该包的子包下所有的类的别名均使用不带包名的类名的第一个字母小写作为别名
+        例如: com.atguigu.mybatis.beans.Student 的别名为: student
+        -->
+        <package name="com.atguigu.mybatis"/>
+    </typeAliases>
+
+6. databaseId:
+    1). 直译为: 数据库的 id. 是 select、update、delete、insert 节点的一个属性.
+    2). 作用: 可以根据不用的数据库, 来编写匹配不同数据库的 SQL
+
+        <insert id="testDatabaseId" databaseId="mysql">
+            INSERT INTO students(last_name, birth)
+            VALUES(#{lastName}, #{birth})
+        </insert>
+
+        <insert id="testDatabaseId" databaseId="oracle">
+            INSERT INTO students(id, last_name, birth)
+            VALUES(my_seq.nextval, #{lastName}, #{birth})
+        </insert>
+
+        注意: id 必须相同!
+
+    3). 必须在 spring 的配置文件中在配置 SqlSessionFactory 时配置 databaseIdProvider 属性:
+
+        <!--
+            配置 databaseIdProvider
+            该属性的类型为： DatabaseIdProvider 类型.
+            而 VendorDatabaseIdProvider 正是 DatabaseIdProvider 接口的一个实现类.
+            而 VendorDatabaseIdProvider 只有一个属性: properties. 是 Properties 类型. 用于配置数据库的映射关系
+            key: 数据库的名字. 是 DatabaseMetaData#getDatabaseProductName() 方法的返回值.
+            MySQL 的返回值为 MySQL. Oracle 的返回值为 Oracle.
+            val: 映射的值. 供在 Mapper.xml 文件中的 databaseId 属性使用
+        -->
+        <property name="databaseIdProvider">
+            <bean class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+                <property name="properties">
+                    <props>
+                        <prop key="MySQL">mysql</prop>
+                        <prop key="Oracle">oracle</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+
+7. 如何获取保存后对象的 id 属性值
+    1). 默认情况下, 执行 insert 后的实体类的 id 为 null
+    2). 对于 MySQL 数据库只需要设置 keyProperty、keyColumn、useGeneratedKeys 属性
+        <!--
+            keyProperty: 把主键值赋给 bean 的哪一个属性
+            keyColumn: 使用哪一列的值来进行赋值
+            useGeneratedKeys="true": 使用自增的方式来生成主键值
+        -->
+        <insert id="testDatabaseId" databaseId="mysql"
+            keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+            INSERT INTO students(last_name, birth)
+            VALUES(#{lastName}, #{birth})
+        </insert>
+
+    3). 对于 Oracle 数据库. 使用 selectKey
+
+        <insert id="testDatabaseId" databaseId="oracle">
+            <!--
+                对于 Oracle 而言, 需要使用 selectKey 来生成主键值
+                order="BEFORE": 先于 INSERT 执行
+                selectKey 的标签体: 指定生成主键的查询语句. SELECT 序列名.nextval FROM dual
+                keyProperty: 把标签体的查询结果赋给 bean 的哪一个属性.
+                resultType: 执行标签体查询的结果类型.
+                注意: 下面编写 SQL 时, 主键不能再次使用序列生成. 而要使用 #{keyProperty}
+            -->
+            <selectKey order="BEFORE"
+                keyProperty="id" resultType="int">
+                SELECT my_seq.nextval FROM dual
+            </selectKey>
+            INSERT INTO students(id, last_name, birth)
+            VALUES(#{id}, #{lastName}, #{birth})
+        </insert>
+
