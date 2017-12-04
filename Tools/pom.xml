@@ -10,7 +10,7 @@
     <artifactId>tools</artifactId>
     <packaging>jar</packaging>
 
-    <name>tools</name>
+    <name>Tools</name>
     <url>http://maven.apache.org</url>
 
     <properties>

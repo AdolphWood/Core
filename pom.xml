@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.adolph</groupId>
     <artifactId>Core</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>mybatis</module>
+        <module>DAO</module>
         <module>tools</module>
         <module>APPs</module>
     </modules>
-    <name>Core Maven Webapp</name>
+    <name>Core</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>

@@ -30,7 +30,6 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 
 public class QRCodeTest {
-
     /**
      * 生成图像
      *
@@ -40,8 +39,8 @@ public class QRCodeTest {
     @Test
     public void testEncode() throws WriterException, IOException {
         // String filePath = "D://";
-        String filePath = "D://Code//Java//Core//tools//src//main//java//com//adolph//zxing";
-        String fileName = "物料5000044-005.png";
+        String filePath = "D://Core//Code//Core//Tools//src//main//java//com//adolph//zxing";
+        String fileName = "物料5000044-011.png";
 
         // 设置JSON内容
         /*JSONObject json = new JSONObject();
@@ -52,13 +51,13 @@ public class QRCodeTest {
         String content = json.toJSONString();// 内容*/
 
         // 物料（5000070）
-        String content = "5000044|1.0|TO|供应商编码4|DA011A0418|005|2016-04-02|张三|";
+        String content = "5000044|1000.0|TO|供应商编码4|DA011A0418|011|2016-04-02|张三|";
         // 备料单
         // String content = "ZJ20160617111327";
         int width = 200; // 图像宽度
         int height = 200; // 图像高度
         String format = "png";// 图像类型
-        Map<EncodeHintType, Object> hints = new HashMap<EncodeHintType, Object>();
+        Map<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "GB2312");
         BitMatrix bitMatrix = new MultiFormatWriter().encode(content,
                 BarcodeFormat.QR_CODE, width, height, hints);// 生成矩阵
