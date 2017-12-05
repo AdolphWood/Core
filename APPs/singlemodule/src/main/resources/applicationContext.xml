@@ -70,7 +70,6 @@
         <property name="mapperLocations" >
             <array>
                 <value>classpath*:com/adolph/dao/xml/*Mapper.xml</value>
-                <value>classpath*:com/adolph/entity/*Mapper.xml</value>
             </array>
         </property>
     </bean>

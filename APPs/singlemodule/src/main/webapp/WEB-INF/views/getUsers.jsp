@@ -14,7 +14,6 @@
             <td>${u.birthday}</td>
         </tr>
     </c:forEach>
-
 </table>
 </body>
 </html>
